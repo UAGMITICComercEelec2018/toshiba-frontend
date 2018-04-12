@@ -23,3 +23,11 @@ yarn-error.log*
 \.env\.production
 
 \.env
+
+#awsmobilejs
+aws-info.json
+project-info.json
+aws-exports.js
+awsmobilejs/.awsmobile/backend-build
+awsmobilejs/\#current-backend-info
+~awsmobilejs-*/
