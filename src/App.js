@@ -8,86 +8,24 @@ import Switch from 'react-router-dom/es/Switch';
 import Route from 'react-router-dom/es/Route';
 import Redirect from 'react-router-dom/es/Redirect';
 import BrowserRouter from 'react-router-dom/es/BrowserRouter';
-
-import Amplify, { Analytics, Hub, Logger } from 'aws-amplify';
-import { withAuthenticator } from 'aws-amplify-react';
-import aws_exports from './aws-exports';
-Amplify.configure(aws_exports);
-Amplify.Logger.LOG_LEVEL = 'DEBUG';
-const logger = new Logger('App');
+import f_pago1 from './methods_statement_cards.png';
+import f_pago2 from './oxxopay.svg';
+import f_pago3 from './paypal.svg';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    Hub.listen('auth', this, 'Auth Listener');
-  }
-  onHubCapsule(capsule) {
-    const { channel, payload } = capsule;
-    logger.debug(channel, payload);
-    if (channel === 'auth') {
-      this.onAuthEvent(payload);
-    }
-  }
-  onAuthEvent(payload) {
-    const { event, data } = payload;
-    Analytics.record(event);
-    switch (event) {
-      case 'signIn':
-        logger.error('user signed in');
-        Analytics.updateEndpoint({
-          UserAttributes: {
-            username: data.username
-          }
-        });
-        break;
-      case 'signUp':
-        logger.error('user signed up');
-        Analytics.updateEndpoint({
-          UserAttributes: {
-            username: data.username
-          }
-        });
-        break;
-      case 'signOut':
-        logger.error('user signed out');
-        Analytics.updateEndpoint({
-          UserAttributes: null
-        });
-        break;
-      case 'signIn_failure':
-        logger.error('user sign in failed');
-        Analytics.updateEndpoint({
-          UserAttributes: null
-        });
-        break;
-      default:
-        logger.error('unexpected auth event');
-        Analytics.updateEndpoint({
-          UserAttributes: null
-        });
-        break;
-    }
-    logger.debug(data);
-  }
-  componentDidMount() {
-    Analytics.record('appMount');
-  }
-
   render() {
     return (
       <BrowserRouter>
         <Switch>
           <Route path="/productos/:id" component={Item} />
           <Route path="/" exact strict component={Item} />
-          <Redirect to="/" />
         </Switch>
       </BrowserRouter>
     );
   }
 }
 
-//export default App;
-export default withAuthenticator(App);
+export default App;
 
 class Item extends Component {
   styles = {
@@ -111,6 +49,13 @@ class Item extends Component {
     },
     navLogo: {
       height: '80%'
+    },
+    navPago1: {
+      display: 'flex',
+      justifycontent: 'center',
+      width: '50%',
+      height: '50%',
+      alignItems: 'flex'
     },
     navLinksContainer: {
       display: 'flex',
@@ -175,38 +120,90 @@ class Item extends Component {
   };
   products = [
     {
-      id: 'producto1',
-      title: 'Camisa 1',
-      description: 'Descripción',
-      price: 100.0,
-      image:
-        'https://vangogh.teespring.com/v3/image/oGRwVyoQlFfX-UDpYHwSIjMuDa0/480/560.jpg',
-      shipping: 'No shipping'
-    },
-    {
-      id: 'producto2',
-      title: 'Camisa 2',
-      description: 'Descripción',
-      price: 100.0,
-      image:
-        'https://vangogh.teespring.com/v3/image/oGRwVyoQlFfX-UDpYHwSIjMuDa0/480/560.jpg',
-      shipping: 'No shipping'
-    },
-    {
-      id: 'cat',
-      title: 'My Cat Can Live A Better Life Shirt',
+      id: '1',
+      title: 'Digestion',
       description:
-        'I Work Hard So My Cat Can Live A Better Life Shirt, Funny Cat Shirt',
-      price: 100.0,
+        'Producto: Digestión Pura. Colon limpio y sana digestión. No mas estreñimiento. Aporta mucílagos naturales, los cuales ayudan a  limpiar el colon de una manera eficáz y natural, sin dañar la salud.',
+      price: 290.0,
+      paymentCredit: 'http://www.visa.com',
+      paymentPaypal:
+        'https://d25s2kdrsa5zeu.cloudfront.net/charge/paypal/item1',
+      paymentOxxo: 'https://d25s2kdrsa5zeu.cloudfront.net/charge/oxxo/item1',
       image:
-        'https://vangogh.teespring.com/v3/image/oGRwVyoQlFfX-UDpYHwSIjMuDa0/480/560.jpg',
-      shipping: `Orders are printed and shipped when the time expires or earlier.
-              You can expect your package to arrive 10 - 13 business days after
-              the product prints. Expedited or Rush shipping may be available
-              depending upon the product(s) selected and the destination
-              country. Shipping costs start at: $3.99 for the first apparel item
-              and $2.00 for each additional apparel item. Products are fulfilled
-              in the US`
+        'http://www.suiiki.com/wp-content/uploads/2018/01/DigestionPura_small.png',
+      shipping:
+        'A toda la Republica, El tiempo de entrega del producto por parte de la Mensajería inicia a partir de la confirmación de la recepción de la orden por parte de la Tienda.'
+    },
+    {
+      id: '2',
+      title: 'Fitoestrogenos',
+      description:
+        'Presentación: Tarro con 270 gr. (30 porciones por envase, equivalente a un mes).',
+      price: 447.0,
+      paymentCredit: 'http://www.visa.com',
+      paymentPaypal:
+        'https://d25s2kdrsa5zeu.cloudfront.net/charge/paypal/item2',
+      paymentOxxo: 'https://d25s2kdrsa5zeu.cloudfront.net/charge/oxxo/item2',
+      image:
+        'http://www.suiiki.com/wp-content/uploads/2018/01/Fitoestrogenos_small-1-300x200.png',
+      shipping:
+        'A toda la Republica, El tiempo de entrega del producto por parte de la Mensajería inicia a partir de la confirmación de la recepción de la orden por parte de la Tienda.'
+    },
+    {
+      id: '3',
+      title: 'Moringa Suiiki',
+      description:
+        'Rico en Vitaminas, Minerales y antioxidantes.\t\tLa moringa es rica en un alto contenido de vitaminas, minerales y aminoácidos.',
+      price: 250.0,
+      paymentCredit: 'http://www.visa.com',
+      paymentPaypal:
+        'https://d25s2kdrsa5zeu.cloudfront.net/charge/paypal/item3',
+      paymentOxxo: 'https://d25s2kdrsa5zeu.cloudfront.net/charge/oxxo/item3',
+      image:
+        'http://www.suiiki.com/wp-content/uploads/2018/01/QuemaGrasa_big-300x200.png',
+      shipping:
+        'A toda la Republica, El tiempo de entrega del producto por parte de la Mensajería inicia a partir de la confirmación de la recepción de la orden por parte de la Tienda.'
+    },
+    {
+      id: '4',
+      title: 'Quema Grasa Corporal',
+      description:
+        'Ayudan a regular el apetito, causando sensación de saciedad. Es un excelente adelgazante y antinflamatorio. No causa efectos dañinos a la salud. No provoca rebote, ya que es natural y su efecto es gradual.',
+      price: 299.9,
+      paymentCredit: 'http://www.gooogle.com',
+      paymentPaypal:
+        'https://d25s2kdrsa5zeu.cloudfront.net/charge/paypal/item4',
+      paymentOxxo: 'https://d25s2kdrsa5zeu.cloudfront.net/charge/oxxo/item4',
+      image:
+        'http://www.suiiki.com/wp-content/uploads/2018/01/QuemaGrasa_big-300x200.png',
+      shipping:
+        'A toda la Republica, El tiempo de entrega del producto por parte de la Mensajería inicia a partir de la confirmación de la recepción de la orden por parte de la Tienda.'
+    },
+    {
+      id: 'Success',
+      title: 'Te hemos timado !!!',
+      description:
+        'Has comprado nuestros productos que ni sirven y no hay devoluciones !!!',
+
+      paymentCredit: '',
+      paymentPaypal: '',
+      paymentOxxo: '',
+      image:
+        'https://image.shutterstock.com/image-photo/emoji-yellow-face-lol-laugh-260nw-669849526.jpg',
+      shipping: 'Lo siento tu producto nunca llegara jeje.'
+    },
+    {
+      id: 'Oxxo',
+      title: 'Te hemos timado pero ahora con Oxxo!!!',
+      description:
+        'Has comprado nuestros productos que ni sirven y no hay devoluciones !!!',
+
+      paymentCredit: '',
+      paymentPaypal: '',
+      paymentOxxo: '',
+      image:
+        'https://image.shutterstock.com/image-photo/emoji-yellow-face-lol-laugh-260nw-669849526.jpg',
+      shipping: 'Lo siento tu producto nunca llegara jeje.'
     }
   ];
   render() {
@@ -217,16 +214,16 @@ class Item extends Component {
     return (
       <Fragment>
         <div style={styles.navContainer}>
-          <img style={styles.navLogo} src={logo} alt="calithecat" />
+          <img style={styles.navLogo} src={logo} alt="suiiki" />
           <div style={styles.navLinksContainer}>
-            <a style={styles.navLink} href="http://midominio.com">
-              HOME
+            <a style={styles.navLink} href="http://www.suiiki.com/">
+              Inicio
             </a>
-            <a style={styles.navLink} href="http://midominio.com/blog">
-              BLOG
+            <a style={styles.navLink} href="http://suiiki.com/sobre-el-sitio/">
+              Sobre el Sitio
             </a>
-            <a style={styles.navLink} href="http://midominio.com/contact">
-              CONTACT
+            <a style={styles.navLink} href="http://suiiki.com/contact/">
+              Contacto
             </a>
           </div>
         </div>
@@ -238,8 +235,28 @@ class Item extends Component {
             <h1 style={styles.title}>{product.title}</h1>
             <p style={styles.description}>{product.description}</p>
             <p style={styles.price}>${product.price} MXN</p>
-            <p style={styles.shipping}>Shipping Info</p>
+            <p style={styles.shipping}>información de envío</p>
             <p style={styles.details}>{product.shipping}</p>
+
+            <p style={styles.details}>
+              <a href={product.paymentCredit}>
+                <img
+                  style={styles.navPago1}
+                  src={f_pago1}
+                  alt="Paga no seas codo"
+                />
+              </a>
+              <a href={product.paymentOxxo}>
+                <img
+                  style={styles.navPago1}
+                  src={f_pago2}
+                  alt="Pagame no te hagas"
+                />
+              </a>
+              <a href={product.paymentPaypal}>
+                <img style={styles.navPago1} src={f_pago3} alt="ya valio !!" />
+              </a>
+            </p>
           </div>
         </div>
       </Fragment>
