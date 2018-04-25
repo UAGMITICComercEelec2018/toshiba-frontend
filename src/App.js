@@ -1,7 +1,4 @@
-import React, {
-  Component,
-  Fragment
-} from 'react';
+import React, { Component, Fragment } from 'react';
 import logo from './logo.png';
 import methods_statement_cards from './methods_statement_cards.png';
 import oxxopay from './oxxopay.svg';
@@ -12,7 +9,70 @@ import Route from 'react-router-dom/es/Route';
 import Redirect from 'react-router-dom/es/Redirect';
 import BrowserRouter from 'react-router-dom/es/BrowserRouter';
 
+import Amplify, { Analytics, Hub, Logger } from 'aws-amplify';
+import { withAuthenticator } from 'aws-amplify-react';
+import aws_exports from './aws-exports';
+Amplify.configure(aws_exports);
+Amplify.Logger.LOG_LEVEL = 'DEBUG';
+const logger = new Logger('App');
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    Hub.listen('auth', this, 'Auth Listener');
+  }
+  onHubCapsule(capsule) {
+    const { channel, payload } = capsule;
+    logger.debug(channel, payload);
+    if (channel === 'auth') {
+      this.onAuthEvent(payload);
+    }
+  }
+  onAuthEvent(payload) {
+    const { event, data } = payload;
+    Analytics.record(event);
+    switch (event) {
+      case 'signIn':
+        logger.error('user signed in');
+        Analytics.updateEndpoint({
+          UserAttributes: {
+            username: data.username
+          }
+        });
+        break;
+      case 'signUp':
+        logger.error('user signed up');
+        Analytics.updateEndpoint({
+          UserAttributes: {
+            username: data.username
+          }
+        });
+        break;
+      case 'signOut':
+        logger.error('user signed out');
+        Analytics.updateEndpoint({
+          UserAttributes: null
+        });
+        break;
+      case 'signIn_failure':
+        logger.error('user sign in failed');
+        Analytics.updateEndpoint({
+          UserAttributes: null
+        });
+        break;
+      default:
+        logger.error('unexpected auth event');
+        Analytics.updateEndpoint({
+          UserAttributes: null
+        });
+        break;
+    }
+    logger.debug(data);
+  }
+  componentDidMount() {
+    Analytics.record('appMount');
+  }
+
   render() {
     return (
       <BrowserRouter>
@@ -26,7 +86,8 @@ class App extends Component {
   }
 }
 
-export default App;
+//export default App;
+export default withAuthenticator(App);
 
 class Item extends Component {
   styles = {
